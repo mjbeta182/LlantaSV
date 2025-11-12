@@ -2,52 +2,35 @@ version: '3.9'
 
 services:
   mysql:
-    image: mysql:8.0
-    container_name: mysql-laravel
-    restart: always
+    image: mysql:8
+    container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: saludplus
-      MYSQL_USER: laraveluser
-      MYSQL_PASSWORD: laravelpass
+      MYSQL_ROOT_PASSWORD: Itca123!
+      MYSQL_DATABASE: llanteria
+      MYSQL_USER: mjbeta
+      MYSQL_PASSWORD: Itca123!
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
   laravel:
-    build:
-      context: ./laravel
-      dockerfile: Dockerfile
-    container_name: laravel-app
-    restart: always
+    build: ./backend-laravel
+    container_name: laravel
     ports:
-      - "8000:8000"
+      - "8000:80"
     depends_on:
       - mysql
     environment:
-      APP_ENV: production
-      APP_DEBUG: "false"
-      APP_KEY: base64:XxYyZz123TuClaveLaravelGenerada
-      DB_CONNECTION: mysql
       DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USERNAME: root
+      DB_DATABASE: llanteria
+      DB_USERNAME: root 
       DB_PASSWORD: Itca123!
-      MYSQL_DATABASE: llanteria
-      MYSQL_ROOT_PASSWORD: Itca123!
-
   react:
-    build:
-      context: ./react
-      dockerfile: Dockerfile
-    container_name: react-app
-    restart: always
+    build: ./frontend-react
+    container_name: react
     ports:
       - "3000:80"
-    depends_on:
-      - laravel
 
 volumes:
   mysql_data:
-
