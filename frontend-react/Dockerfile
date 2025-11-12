@@ -1,12 +1,14 @@
-FROM node:22 AS build
+# Etapa 1: Construcción
+FROM node:20 AS build
 
 WORKDIR /app
-
-COPY package*.json ./
-RUN npm install
-
 COPY . .
+RUN npm install
+RUN npm run build
 
-EXPOSE 5173
+# Etapa 2: Servir archivos estáticos
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
 
-CMD ["npm", "run", "dev", "--", "--host"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

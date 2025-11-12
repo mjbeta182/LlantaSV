@@ -1,42 +1,51 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  backend:
-    container_name: llanteria-sv2-backend
-    build: ./backend-laravel
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./backend-laravel:/var/www/html
-    working_dir: /var/www/html
-    command: php artisan serve --host=0.0.0.0 --port=3000
-    depends_on:
-      - db
-
-  frontend:
-    container_name: llanteria-sv2-frontend
-    build: ./frontend-react
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend-react:/app
-      - /app/node_modules
-    working_dir: /app
-    command: npm run dev -- --host
-    depends_on:
-      - backend
-
-  db:
-    container_name: llanteria-sv2-db
+  mysql:
     image: mysql:8.0
+    container_name: mysql-laravel
     restart: always
     environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: saludplus
+      MYSQL_USER: laraveluser
+      MYSQL_PASSWORD: laravelpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  laravel:
+    build:
+      context: ./laravel
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: base64:XxYyZz123TuClaveLaravelGenerada
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: llanteria
+
+  react:
+    build:
+      context: ./react
+      dockerfile: Dockerfile
+    container_name: react-app
+    restart: always
     ports:
-      - "3307:3306"
-    volumes:
-      - dbdata:/var/lib/mysql
+      - "3000:80"
+    depends_on:
+      - laravel
 
 volumes:
-  dbdata:
+  mysql_data:
+
