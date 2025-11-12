@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: laravel-api
+  template:
+    metadata:
+      labels:
+        app: laravel-api
+    spec:
+      containers:
+        - name: laravel
+          image: us-central1-docker.pkg.dev/llantasv/app-repo/laravel:v1
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_ENV
+              value: production
+            - name: DB_CONNECTION
+              value: mysql
+            - name: DB_HOST
+              value: 127.0.0.1
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_DATABASE
+              value: saludplusdb
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_PASSWORD
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.33.14
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances=llantasv:us-central1:llanteria=tcp:3306"
+          securityContext:
+            runAsNonRoot: true
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: laravel-service
+spec:
+  type: ClusterIP
+  selector:
+    app: laravel-api
+  ports:
+    - port: 8000
+      targetPort: 8000

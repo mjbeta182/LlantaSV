@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: llanteria-sv2-backend
+    build: ./backend-laravel
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend-laravel:/var/www/html
+    working_dir: /var/www/html
+    command: php artisan serve --host=0.0.0.0 --port=3000
+    depends_on:
+      - db
+
+  frontend:
+    container_name: llanteria-sv2-frontend
+    build: ./frontend-react
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend-react:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+
+  db:
+    container_name: llanteria-sv2-db
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: llanteria
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 
+      MYSQL_ROOT_PASSWORD: 
+    ports:
+      - "3307:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:
