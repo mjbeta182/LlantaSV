@@ -32,8 +32,10 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: mysql
       DB_PORT: 3306
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      DB_USERNAME: root
+      DB_PASSWORD: Itca123!
       MYSQL_DATABASE: llanteria
+      MYSQL_ROOT_PASSWORD: Itca123!
 
   react:
     build:
